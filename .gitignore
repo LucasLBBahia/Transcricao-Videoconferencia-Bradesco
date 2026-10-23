@@ -1,0 +1,17 @@
+# Áudios, modelos e documentos ficam fora do repositório:
+# podem ser grandes ou conter material interno do banco.
+*.wav
+*.m4a
+*.mp3
+*.mp4
+*.webm
+*.part
+*.ytdl
+*.onnx
+*.docx
+*.pdf
+modelos/
+dados/
+saidas/
+venv/
+__pycache__/

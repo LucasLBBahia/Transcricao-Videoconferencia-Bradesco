@@ -1,0 +1,9 @@
+faster-whisper>=1.2
+sherpa-onnx>=1.13
+soundfile>=0.13
+scikit-learn>=1.5
+numpy>=2.0
+pypdf>=5.0
+# GPU NVIDIA (CUDA 12): DLLs do cuBLAS e do cuDNN usadas pelo faster-whisper
+nvidia-cublas-cu12
+nvidia-cudnn-cu12==9.*
