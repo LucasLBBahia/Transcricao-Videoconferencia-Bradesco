@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protótipo · Transcrição de Videoconferências</title>
+<!-- Protótipo navegável da interface proposta. Não processa áudio: os estados e os realces são de exemplo.
+     Cores, raios e sombras seguem o Bradesco Design System; a fonte Hanken Grotesk substitui a Bradesco Sans. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --red:#cc092f;--red-hover:#b00828;--red-400:#a5091b;--red-bg:#fbe4e8;
+  --gray-50:#ededed;--gray-100:#bcbec0;--gray-300:#939598;--gray-400:#808285;--gray-500:#58595b;
+  --text-strong:#1a1a1a;--text-body:#333333;--border-subtle:#e3e3e3;
+  --success:#1e7a44;--success-bg:#e7f3ec;--warning:#b26a00;--warning-bg:#fbf0de;--info:#2a5c8a;--info-bg:#e6eef6;
+  --radius-md:12px;--radius-lg:16px;
+  --shadow-xs:0 1px 2px rgba(16,16,16,.06);--shadow-md:0 6px 20px rgba(16,16,16,.10);--shadow-brand:0 10px 28px rgba(204,9,47,.28);
+  --focus-ring:0 0 0 3px rgba(204,9,47,.30);
+  --font:'Hanken Grotesk',-apple-system,'Segoe UI',system-ui,sans-serif;
+  --ease:cubic-bezier(.2,0,0,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--gray-50);font-family:var(--font);color:var(--text-body);font-size:16px;line-height:1.5}
+a{color:var(--red)}a:hover{color:var(--red-400)}
+:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+h1,h2,h3,p{margin:0}
+
+/* topo */
+.topo{background:var(--red);color:#fff}
+.topo-in{max-width:1200px;margin:0 auto;padding:0 32px;min-height:72px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px}
+.topo img{height:28px;width:126px;object-fit:contain;display:block}
+.topo .sep{width:1px;height:28px;background:rgba(255,255,255,.45)}
+.topo .produto{font-size:16px;font-weight:600}
+.topo nav{margin-left:auto;display:flex;gap:24px;font-size:15px}
+.topo nav a{color:#fff;text-decoration:none;font-weight:500}
+.topo nav a[aria-current="page"]{font-weight:700;text-decoration:underline;text-underline-offset:6px}
+
+main{max-width:1200px;margin:0 auto;padding:40px 32px 72px;display:flex;flex-direction:column;gap:28px}
+.tela{display:flex;flex-direction:column;gap:28px}
+.tela[hidden]{display:none}
+.cabeca{display:flex;flex-direction:column;gap:10px}
+.cabeca-linha{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+.sobre{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+h1{font-size:40px;line-height:1.15;font-weight:800;letter-spacing:-.02em;color:var(--text-strong)}
+.lead{max-width:780px;font-size:18px;line-height:1.55;color:var(--gray-500)}
+.colunas{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.principal{flex:999 1 620px;min-width:0;display:flex;flex-direction:column;gap:20px;margin:0}
+.lateral{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:20px}
+.card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border-subtle);box-shadow:var(--shadow-xs);padding:28px;display:flex;flex-direction:column;gap:20px}
+.lateral .card{padding:24px;gap:14px}
+.card h2{font-size:20px;font-weight:700;color:var(--text-strong)}
+.lateral .card h2{font-size:18px}
+.card h3{font-size:16px;font-weight:700;color:var(--text-strong)}
+.card-cab{display:flex;flex-direction:column;gap:6px}
+.titulo-badge{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.desc{font-size:15px;line-height:1.55;color:var(--gray-500)}
+.grade3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+
+/* etapas do fluxo */
+.etapas{list-style:none;margin:0;padding:16px 20px;display:flex;flex-wrap:wrap;gap:12px 32px;background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border-subtle)}
+.etapas li{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:500;color:var(--gray-500)}
+.etapas .num{width:28px;height:28px;border-radius:999px;border:1.5px solid var(--gray-400);display:flex;align-items:center;justify-content:center;font-size:13px}
+.etapas li.atual{font-weight:700;color:var(--red)}
+.etapas li.atual .num{background:var(--red);border-color:var(--red);color:#fff}
+.etapas li.feita{color:var(--success)}
+.etapas li.feita .num{background:var(--success);border-color:var(--success);color:#fff}
+
+/* campos */
+.campo{display:flex;flex-direction:column;gap:6px}
+.campo label,.rotulo{font-size:14px;font-weight:600;color:var(--text-strong)}
+.campo input,.campo select,.campo textarea{font:inherit;font-size:16px;color:var(--text-body);background:#fff;border:1.5px solid var(--gray-100);border-radius:var(--radius-md);width:100%}
+.campo input,.campo select{height:48px;padding:0 14px}
+.campo select{appearance:none;padding-right:40px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2358595b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;cursor:pointer}
+.campo textarea{padding:12px 14px;line-height:1.5;resize:vertical}
+.campo input:focus,.campo select:focus,.campo textarea:focus{outline:none;border-color:var(--red);box-shadow:var(--focus-ring)}
+.dica{font-size:13px;color:var(--gray-500)}
+
+.envio{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:32px 24px;border:2px dashed var(--gray-300);border-radius:var(--radius-lg);background:var(--gray-50);text-align:center;cursor:pointer}
+.envio.pequeno{flex-direction:row;flex-wrap:wrap;justify-content:flex-start;text-align:left;padding:16px;border-width:1.5px;background:#fff;border-radius:var(--radius-md)}
+.envio:focus-within{border-color:var(--red);box-shadow:var(--focus-ring)}
+.envio input{position:absolute;width:1px;height:1px;opacity:0}
+.envio .icone{width:48px;height:48px;border-radius:12px;background:var(--red-bg);color:var(--red);display:flex;align-items:center;justify-content:center}
+.envio.pequeno .icone{width:auto;height:auto;background:none}
+.envio .forte{font-size:16px;font-weight:600;color:var(--text-strong)}
+.envio.pequeno .forte{font-size:15px}
+.envio .fraco{font-size:14px;color:var(--gray-500)}
+.envio .escolhido{font-size:14px;font-weight:600;color:var(--success)}
+.envio .textos{display:flex;flex-direction:column;gap:2px}
+
+.linha-arquivo{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:var(--radius-md);border:1px solid var(--border-subtle)}
+.linha-arquivo .info{display:flex;align-items:center;gap:12px}
+.linha-arquivo .textos{display:flex;flex-direction:column;gap:2px}
+.linha-arquivo .forte{font-size:15px;font-weight:600;color:var(--text-strong)}
+.linha-arquivo .fraco{font-size:14px;color:var(--gray-500)}
+
+/* botões */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 22px;border-radius:var(--radius-md);border:1.5px solid transparent;font:inherit;font-size:16px;font-weight:600;line-height:1;text-decoration:none;white-space:nowrap;cursor:pointer;transition:background .12s var(--ease),transform .12s var(--ease)}
+.btn:active{transform:scale(.97)}
+.btn-sm{height:40px;padding:0 16px;font-size:14px}
+.btn-lg{height:56px;padding:0 32px;font-size:17px}
+.btn-primario{background:var(--red);color:#fff;box-shadow:var(--shadow-brand)}
+.btn-primario:hover{background:var(--red-hover);color:#fff}
+.btn-secundario{background:transparent;color:var(--red);border-color:var(--red)}
+.btn-secundario:hover{background:rgba(204,9,47,.06);color:var(--red)}
+.btn-fantasma{background:transparent;color:var(--red)}
+.btn-fantasma:hover{background:rgba(204,9,47,.06)}
+.btn-suave{background:var(--gray-50);color:var(--text-strong)}
+.btn-suave:hover{background:var(--gray-100)}
+.btn.sem-sombra{box-shadow:none}
+.btn[aria-disabled="true"]{opacity:.45;pointer-events:none;box-shadow:none}
+.acoes{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
+.nota{font-size:14px;color:var(--gray-500)}
+.pilha{display:flex;flex-direction:column;gap:12px}
+.pilha .nota{text-align:center;font-size:13px}
+
+/* badges e alertas */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;font-size:14px;font-weight:600;line-height:1.2}
+.badge.sm{padding:2px 8px;font-size:12px}
+.badge.marca{background:var(--red-bg);color:var(--red)}
+.badge.neutro{background:var(--gray-50);color:var(--text-body)}
+.badge.sucesso{background:var(--success-bg);color:var(--success)}
+.badge.info{background:var(--info-bg);color:var(--info)}
+.alerta{display:flex;gap:12px;padding:14px 16px;border-radius:var(--radius-md);font-size:14px}
+.alerta.info{background:var(--info-bg)}
+.alerta.aviso{background:var(--warning-bg)}
+.alerta .icone{flex-shrink:0;margin-top:1px}
+.alerta.info .icone{color:var(--info)}
+.alerta.aviso .icone{color:var(--warning)}
+.alerta strong{display:block;color:var(--text-strong)}
+
+ol.passos{margin:0;padding:0 0 0 20px;display:flex;flex-direction:column;gap:10px;font-size:15px;line-height:1.45}
+ul.simples{margin:0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:1.45}
+dl.dados{margin:0;display:grid;grid-template-columns:auto 1fr;gap:10px 16px;font-size:15px}
+dl.dados dt{color:var(--gray-500)}
+dl.dados dd{margin:0;font-weight:600;color:var(--text-strong)}
+
+/* acompanhamento */
+.lista-etapas{list-style:none;margin:0;padding:0}
+.lista-etapas li{display:flex;gap:16px;padding:16px 0;border-top:1px solid var(--border-subtle)}
+.estado{flex-shrink:0;width:32px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.estado.feita{background:var(--success-bg);color:var(--success)}
+.estado.rodando{border:3px solid var(--red-bg);border-top-color:var(--red);animation:gira 1s linear infinite}
+.estado.espera{border:1.5px solid var(--gray-400);color:var(--gray-500)}
+@keyframes gira{to{transform:rotate(360deg)}}
+.etapa-corpo{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.etapa-topo{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.etapa-nome{font-size:16px;font-weight:700;color:var(--text-strong)}
+.etapa-status{font-size:14px;font-weight:600}
+.etapa-status.feita{color:var(--success)}
+.etapa-status.rodando{color:var(--red)}
+.etapa-status.espera{color:var(--gray-500)}
+.etapa-detalhe{font-size:15px;line-height:1.5;color:var(--gray-500)}
+.barra{margin-top:8px;height:8px;border-radius:999px;background:var(--gray-50);overflow:hidden}
+.barra span{display:block;height:100%;width:60%;border-radius:999px;background:var(--red)}
+.barra.anima span{animation:enche 1.1s linear forwards}
+@keyframes enche{from{width:0}to{width:100%}}
+.blocos{margin-top:6px;display:flex;flex-wrap:wrap;gap:8px}
+.etapa-corpo .alerta{margin-top:8px}
+
+/* conferência */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.kpi{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border-subtle);padding:20px 24px;display:flex;flex-direction:column;gap:4px}
+.kpi .rot{font-size:14px;font-weight:600;color:var(--gray-500)}
+.kpi .valor{font-size:32px;font-weight:800;letter-spacing:-.02em;color:var(--text-strong)}
+.kpi .valor.marca{color:var(--red)}
+.kpi .sub{font-size:14px;color:var(--gray-500)}
+.filtros{display:flex;flex-wrap:wrap;gap:8px}
+.filtros button{height:36px;padding:0 16px;border-radius:999px;font:inherit;font-size:14px;font-weight:500;cursor:pointer;background:#fff;color:var(--text-body);border:1px solid var(--gray-100)}
+.filtros button[aria-pressed="true"]{background:var(--red);color:#fff;border-color:var(--red)}
+.realce{display:flex;flex-direction:column;gap:12px;padding:20px 0;border-top:1px solid var(--border-subtle)}
+.realce-topo{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.realce-topo .esq{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.onde{font-size:14px;color:var(--gray-500)}
+.trecho{font-size:17px;line-height:1.5;color:var(--text-strong)}
+mark{background:#fff59d;color:#1a1a1a;padding:1px 4px;border-radius:4px}
+.trecho.aprovado mark{background:transparent;padding:0}
+.motivo{font-size:15px;line-height:1.5;color:var(--gray-500)}
+.realce-acoes{display:flex;flex-wrap:wrap;gap:8px}
+.checagem{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--border-subtle)}
+.checagem .textos{display:flex;flex-direction:column;gap:2px}
+.checagem .forte{font-size:15px;font-weight:600;color:var(--text-strong)}
+.checagem .fraco{font-size:14px;line-height:1.4;color:var(--gray-500)}
+
+/* download */
+.pronto{background:var(--red);color:#fff;border-radius:var(--radius-lg);padding:36px 40px;display:flex;flex-wrap:wrap;align-items:center;gap:24px}
+.pronto h1{color:#fff}
+.pronto p{font-size:18px}
+.pronto .selo{flex-shrink:0;width:64px;height:64px;border-radius:999px;background:#fff;color:var(--red);display:flex;align-items:center;justify-content:center}
+.arquivo{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;border-top:1px solid var(--border-subtle)}
+.arquivo .info{display:flex;align-items:center;gap:14px;min-width:0}
+.arquivo .tipo{flex-shrink:0;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.tipo.docx{background:var(--info-bg);color:var(--info)}
+.tipo.pdf{background:var(--red-bg);color:var(--red)}
+.tipo.outro{background:var(--gray-50);color:var(--text-body)}
+.arquivo .textos{display:flex;flex-direction:column;gap:2px;min-width:0}
+.arquivo .forte{font-size:16px;font-weight:700;color:var(--text-strong)}
+.arquivo .fraco{font-size:14px;color:var(--gray-500)}
+
+.aviso-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--text-strong);color:#fff;padding:12px 18px;border-radius:var(--radius-md);box-shadow:var(--shadow-md);font-size:15px;max-width:calc(100% - 32px)}
+.aviso-toast[hidden]{display:none}
+
+@media (max-width:640px){
+  .topo-in,main{padding-left:16px;padding-right:16px}
+  h1{font-size:30px}
+  .card{padding:20px}
+  .pronto{padding:28px 24px}
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-in">
+    <img src="assets/logo-bradesco-negativo.png" alt="Bradesco">
+    <span class="sep" aria-hidden="true"></span>
+    <span class="produto">Transcrição de Videoconferências · RI</span>
+    <nav aria-label="Principal"><a href="#nova" id="nav-nova">Nova transcrição</a></nav>
+  </div>
+</header>
+
+<main>
+  <ol class="etapas" id="etapas" aria-label="Etapas"></ol>
+
+  <!-- 1. NOVA TRANSCRIÇÃO -->
+  <section class="tela" id="tela-nova" aria-labelledby="t-nova">
+    <div class="cabeca">
+      <span class="sobre">Nova transcrição</span>
+      <h1 id="t-nova">Transcrever a videoconferência de resultados</h1>
+      <p class="lead">Informe os links da transmissão e envie o modelo do trimestre. A ferramenta transcreve, separa os falantes, revisa no padrão do RI e gera o Word.</p>
+    </div>
+
+    <div class="colunas">
+      <form class="principal" id="form-nova" novalidate>
+
+        <section class="card" aria-labelledby="s-dados">
+          <h2 id="s-dados">Dados da teleconferência</h2>
+          <div class="grade3">
+            <div class="campo">
+              <label for="trimestre">Trimestre</label>
+              <select id="trimestre"><option>3T26</option><option>4T26</option><option>1T27</option></select>
+            </div>
+            <div class="campo">
+              <label for="data">Data da teleconferência</label>
+              <input id="data" type="date" value="2026-10-23">
+            </div>
+            <div class="campo">
+              <label for="versoes">Versões a gerar</label>
+              <select id="versoes"><option>Português</option><option>Português e inglês</option></select>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="s-links">
+          <div class="card-cab">
+            <h2 id="s-links">Links da transmissão no YouTube</h2>
+            <p class="desc">A página de RI publica três versões. A ferramenta usa a de português e a do áudio original.</p>
+          </div>
+          <div class="campo">
+            <label for="link-pt">Canal em português</label>
+            <input id="link-pt" type="url" placeholder="https://www.youtube.com/watch?v=…">
+            <span class="dica">O áudio é baixado uma única vez, depois que a transmissão terminar.</span>
+          </div>
+          <div class="campo">
+            <label for="link-original">Áudio Original</label>
+            <input id="link-original" type="url" placeholder="https://www.youtube.com/watch?v=…">
+            <span class="dica">Usado para recuperar a fala quando o canal em português fica mudo.</span>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="s-modelo">
+          <div class="card-cab">
+            <div class="titulo-badge">
+              <h2 id="s-modelo">Arquivo modelo do trimestre</h2>
+              <span class="badge marca sm">Obrigatório</span>
+            </div>
+            <p class="desc">A transcrição é montada em cima deste arquivo: faixa vermelha, logo, rodapé e estilos ficam como estão. Só o corpo do texto e as três linhas do cabeçalho são trocados.</p>
+          </div>
+
+          <label class="envio" for="arquivo-modelo">
+            <span class="icone" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+            <span class="forte">Arraste o .docx do modelo ou clique para escolher</span>
+            <span class="fraco">Somente .docx · o modelo enviado pelo RI, já com o cabeçalho do trimestre</span>
+            <span class="escolhido" data-nome-de="arquivo-modelo" hidden></span>
+            <input id="arquivo-modelo" type="file" accept=".docx">
+          </label>
+
+          <div class="linha-arquivo">
+            <div class="info">
+              <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#58595b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              <div class="textos">
+                <span class="forte">Não tem o modelo em mãos?</span>
+                <span class="fraco">Baixe o modelo usado no trimestre anterior, ajuste e envie de volta.</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secundario btn-sm" data-aviso="No sistema, este botão baixa o último modelo .docx usado.">Baixar modelo do 2T26</button>
+          </div>
+
+          <div class="card-cab">
+            <h3>Cabeçalho do Word</h3>
+            <p class="desc">Preenchido a partir do trimestre e da data. Pode ser ajustado.</p>
+          </div>
+          <div class="grade3">
+            <div class="campo"><label for="linha1">Linha 1</label><input id="linha1" value="Transcrição da Videoconferência"></div>
+            <div class="campo"><label for="linha2">Linha 2</label><input id="linha2" value="Resultados do 3T26"></div>
+            <div class="campo"><label for="linha3">Linha 3</label><input id="linha3" value="23 de outubro de 2026"></div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="s-apoio">
+          <div class="card-cab">
+            <h2 id="s-apoio">Apoio à revisão</h2>
+            <p class="desc">Ajuda a acertar nomes, siglas, títulos de slide, números e o nível de edição.</p>
+          </div>
+
+          <label class="envio pequeno" for="arquivo-deck">
+            <span class="icone" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+            <span class="textos">
+              <span class="forte">Apresentação do trimestre (PDF)</span>
+              <span class="fraco">Opcional · usada para conferir títulos dos slides e números</span>
+              <span class="escolhido" data-nome-de="arquivo-deck" hidden></span>
+            </span>
+            <input id="arquivo-deck" type="file" accept=".pdf">
+          </label>
+
+          <label class="envio pequeno" for="arquivo-anterior">
+            <span class="icone" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+            <span class="textos">
+              <span class="forte">Transcrição publicada do trimestre anterior (PDF)</span>
+              <span class="fraco">Opcional · exemplo do nível de edição esperado pelo RI</span>
+              <span class="escolhido" data-nome-de="arquivo-anterior" hidden></span>
+            </span>
+            <input id="arquivo-anterior" type="file" accept=".pdf">
+          </label>
+
+          <div class="campo">
+            <label for="vocabulario">Vocabulário do trimestre</label>
+            <textarea id="vocabulario" rows="5">Videoconferência de resultados do 3T26 do Bradesco, com Marcelo Noronha, Cassiano Scarpelli, André Carvalho, Ney Ferraz Dias e Carlos Marinelli. Lucro líquido recorrente, ROAE, ROE, PDD, over 90, FGI, FGO, MPME, SME, Selic, guidance, NII, NIM, JCP, RAR, TVM, cost of risk, market share, Bradseg, Bradsaúde, BJD, Banco John Deere…</textarea>
+            <span class="dica">Atualize a cada trimestre com executivos, analistas e siglas. O Whisper usa esta lista para acertar a grafia.</span>
+          </div>
+        </section>
+
+        <div class="acoes">
+          <a class="btn btn-primario btn-lg" href="#acompanhamento">
+            Iniciar transcrição
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+          </a>
+          <span class="nota">Você acompanha cada etapa na próxima tela.</span>
+        </div>
+      </form>
+
+      <aside class="lateral">
+        <section class="card" aria-labelledby="s-depois">
+          <h2 id="s-depois">O que acontece depois</h2>
+          <ol class="passos">
+            <li>Baixa o áudio dos dois canais</li>
+            <li>Procura cortes de áudio no canal em português</li>
+            <li>Transcreve com o Whisper, no modo sequencial</li>
+            <li>Retranscreve as pausas para recuperar falas perdidas</li>
+            <li>Separa os falantes e atribui os nomes</li>
+            <li>Revisa em blocos, no padrão editorial do RI</li>
+            <li>Roda as conferências automáticas</li>
+            <li>Gera o Word em cima do modelo enviado</li>
+          </ol>
+        </section>
+        <div class="alerta info" role="note">
+          <span class="icone" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></span>
+          <div><strong>Atenção ao YouTube</strong>Consultas seguidas geram bloqueio temporário (HTTP 429). Inicie só depois que a transmissão terminar.</div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 2. ACOMPANHAMENTO -->
+  <section class="tela" id="tela-acompanhamento" aria-labelledby="t-acomp" hidden>
+    <div class="cabeca-linha">
+      <div class="cabeca">
+        <span class="sobre">Processamento</span>
+        <h1 id="t-acomp">Resultados do <span data-trimestre>3T26</span></h1>
+        <p class="lead">Teleconferência de <span data-data-extenso>23 de outubro de 2026</span> · 87,8 min de gravação</p>
+      </div>
+      <span class="badge info" id="status-job">Em andamento</span>
+    </div>
+
+    <div class="colunas">
+      <section class="card principal" aria-labelledby="s-etapas" style="gap:4px">
+        <h2 id="s-etapas" style="margin-bottom:12px">Etapas</h2>
+        <ol class="lista-etapas" id="lista-etapas"></ol>
+      </section>
+
+      <aside class="lateral">
+        <section class="card" aria-labelledby="s-dados-job">
+          <h2 id="s-dados-job">Dados desta transcrição</h2>
+          <dl class="dados">
+            <dt>Trimestre</dt><dd data-trimestre>3T26</dd>
+            <dt>Data</dt><dd data-data-curta>23/10/2026</dd>
+            <dt>Versões</dt><dd data-versoes>Português</dd>
+            <dt>Modelo</dt><dd data-modelo>.docx do RI</dd>
+            <dt>Vocabulário</dt><dd>5 executivos, 13 analistas e siglas</dd>
+          </dl>
+        </section>
+        <section class="card" aria-labelledby="s-motor">
+          <h2 id="s-motor">Como está rodando</h2>
+          <ul class="simples">
+            <li>Whisper large-v3 na GPU do servidor</li>
+            <li>Separação de vozes com sherpa-onnx</li>
+            <li>Revisão com o Claude Code, bloco a bloco</li>
+          </ul>
+        </section>
+        <div class="pilha">
+          <a class="btn btn-primario" id="btn-conferencia" href="#conferencia" aria-disabled="true">Abrir conferência</a>
+          <span class="nota" id="nota-conferencia">Liberado quando todas as etapas terminarem.</span>
+          <button type="button" class="btn btn-fantasma btn-sm" id="btn-pular">Pular simulação</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 3. CONFERÊNCIA -->
+  <section class="tela" id="tela-conferencia" aria-labelledby="t-conf" hidden>
+    <div class="cabeca">
+      <span class="sobre">Conferência do RI · Resultados do <span data-trimestre>3T26</span></span>
+      <h1 id="t-conf">45 trechos para conferir</h1>
+      <p class="lead">Nomes deduzidos, números que divergem do deck e trechos duvidosos saem realçados em amarelo no Word. Aprove ou ajuste cada um antes de gerar o arquivo final.</p>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><span class="rot">Word gerado</span><span class="valor">15 páginas</span><span class="sub">Abertura, slides 2 a 15 e Q&amp;A</span></div>
+      <div class="kpi"><span class="rot">Q&amp;A</span><span class="valor">11 analistas</span><span class="sub">Nomes pela lista do trimestre</span></div>
+      <div class="kpi"><span class="rot">Para conferir</span><span class="valor marca">45 realces</span><span class="sub"><span id="aprovados">0</span> aprovados até agora</span></div>
+      <div class="kpi"><span class="rot">Áudio</span><span class="valor">1 corte</span><span class="sub">1min45 aos 15:40, recuperado</span></div>
+    </div>
+
+    <div class="colunas">
+      <section class="card principal" aria-labelledby="s-realces" style="gap:18px">
+        <div class="etapa-topo" style="align-items:baseline">
+          <h2 id="s-realces">Trechos realçados</h2>
+          <span class="nota">Mostrando <span id="mostrando">5</span> de 45</span>
+        </div>
+        <div class="filtros" role="group" aria-label="Filtrar por motivo" id="filtros"></div>
+        <div id="lista-realces"></div>
+      </section>
+
+      <aside class="lateral">
+        <section class="card" aria-labelledby="s-checks" style="gap:4px">
+          <h2 id="s-checks" style="margin-bottom:8px">Conferências automáticas</h2>
+          <div class="checagem"><div class="textos"><span class="forte">Cobertura da fala</span><span class="fraco">Nada da transcrição crua ficou de fora da revisão.</span></div><span class="badge sucesso sm">OK</span></div>
+          <div class="checagem"><div class="textos"><span class="forte">Números não falados</span><span class="fraco">Nenhum número do texto deixou de aparecer na fala.</span></div><span class="badge sucesso sm">OK</span></div>
+          <div class="checagem"><div class="textos"><span class="forte">Traços no meio das falas</span><span class="fraco">Nenhum traço usado como pontuação.</span></div><span class="badge sucesso sm">OK</span></div>
+          <div class="checagem"><div class="textos"><span class="forte">Parágrafos no Q&amp;A</span><span class="fraco">Cada fala em um único parágrafo.</span></div><span class="badge sucesso sm">OK</span></div>
+          <div class="checagem"><div class="textos"><span class="forte">Marcações de realce e itálico</span><span class="fraco">Todas abertas e fechadas corretamente.</span></div><span class="badge sucesso sm">OK</span></div>
+        </section>
+        <div class="pilha">
+          <a class="btn btn-primario" href="#download">Gerar Word</a>
+          <button type="button" class="btn btn-secundario" data-aviso="No sistema, este botão baixa o texto marcado (final.txt).">Baixar texto marcado (.txt)</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 4. DOWNLOAD -->
+  <section class="tela" id="tela-download" aria-labelledby="t-pronto" hidden>
+    <section class="pronto" aria-labelledby="t-pronto">
+      <span class="selo" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+      <div class="cabeca">
+        <h1 id="t-pronto">Transcrição pronta</h1>
+        <p>Resultados do <span data-trimestre>3T26</span> · montada em cima do modelo do trimestre</p>
+      </div>
+    </section>
+
+    <div class="colunas">
+      <section class="card principal" aria-labelledby="s-arquivos" style="gap:4px">
+        <h2 id="s-arquivos" style="margin-bottom:12px">Arquivos</h2>
+        <div class="arquivo">
+          <div class="info"><span class="tipo docx" aria-hidden="true">DOCX</span><div class="textos"><span class="forte">Transcrição da Videoconferência · Resultados do <span data-trimestre>3T26</span></span><span class="fraco">Word · 15 páginas · trechos a conferir realçados em amarelo</span></div></div>
+          <button type="button" class="btn btn-primario btn-sm sem-sombra" data-aviso="No sistema, este botão baixa o .docx gerado.">Baixar .docx</button>
+        </div>
+        <div class="arquivo">
+          <div class="info"><span class="tipo pdf" aria-hidden="true">PDF</span><div class="textos"><span class="forte">Versão em PDF</span><span class="fraco">Gerada pelo Word, para conferir o layout</span></div></div>
+          <button type="button" class="btn btn-secundario btn-sm" data-aviso="No sistema, este botão baixa o PDF.">Baixar .pdf</button>
+        </div>
+        <div class="arquivo">
+          <div class="info"><span class="tipo outro" aria-hidden="true">EN</span><div class="textos"><span class="forte">Video Conference Transcript · 3Q26 Results</span><span class="fraco">Versão em inglês, traduzida do texto já revisado · ainda não gerada</span></div></div>
+          <button type="button" class="btn btn-secundario btn-sm" data-aviso="No sistema, este botão traduz o texto revisado e gera o Word em inglês.">Gerar versão em inglês</button>
+        </div>
+        <div class="arquivo">
+          <div class="info"><span class="tipo outro" aria-hidden="true">TXT</span><div class="textos"><span class="forte">Relatório das conferências</span><span class="fraco">Cobertura da fala, números, traços e marcações</span></div></div>
+          <button type="button" class="btn btn-fantasma btn-sm" data-aviso="No sistema, este botão baixa o relatório das conferências.">Baixar .txt</button>
+        </div>
+      </section>
+
+      <aside class="lateral">
+        <section class="card" aria-labelledby="s-resumo">
+          <h2 id="s-resumo">Resumo</h2>
+          <dl class="dados">
+            <dt>Gravação</dt><dd>87,8 min</dd>
+            <dt>Conteúdo</dt><dd>Abertura, slides 2 a 15 e Q&amp;A</dd>
+            <dt>Q&amp;A</dt><dd>11 analistas</dd>
+            <dt>Realces</dt><dd>45 trechos</dd>
+            <dt>Áudio</dt><dd>1 corte recuperado</dd>
+          </dl>
+        </section>
+        <div class="pilha">
+          <a class="btn btn-secundario" href="#conferencia">Voltar para a conferência</a>
+          <a class="btn btn-fantasma" href="#nova">Nova transcrição</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<div class="aviso-toast" id="aviso" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function () {
+  var TELAS = ['nova', 'acompanhamento', 'conferencia', 'download'];
+  var NOMES_ETAPAS = ['Dados', 'Processamento', 'Conferência', 'Download'];
+  var MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  var captura = /captura/.test(location.search);
+  var $ = function (id) { return document.getElementById(id); };
+
+  var ICONE_OK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+  var ICONE_ALERTA = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>';
+
+  // ---------- navegação ----------
+  function telaAtual() {
+    var h = location.hash.replace('#', '');
+    return TELAS.indexOf(h) >= 0 ? h : 'nova';
+  }
+
+  function desenhaEtapas(indice) {
+    $('etapas').innerHTML = NOMES_ETAPAS.map(function (nome, i) {
+      var cls = i < indice ? 'feita' : i === indice ? 'atual' : '';
+      var marca = i < indice ? ICONE_OK : String(i + 1);
+      return '<li class="' + cls + '"' + (i === indice ? ' aria-current="step"' : '') + '><span class="num" aria-hidden="true">' + marca + '</span>' + nome + '</li>';
+    }).join('');
+  }
+
+  function mostra() {
+    var t = telaAtual();
+    TELAS.forEach(function (nome) { $('tela-' + nome).hidden = nome !== t; });
+    desenhaEtapas(TELAS.indexOf(t));
+    if (t === 'nova') { $('nav-nova').setAttribute('aria-current', 'page'); } else { $('nav-nova').removeAttribute('aria-current'); }
+    if (t === 'acompanhamento') { iniciaSimulacao(); }
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', mostra);
+
+  // ---------- tela 1: dados ----------
+  function dataExtenso(valor) {
+    var p = (valor || '').split('-');
+    if (p.length !== 3) { return ''; }
+    return Number(p[2]) + ' de ' + MESES[Number(p[1]) - 1] + ' de ' + p[0];
+  }
+  function dataCurta(valor) {
+    var p = (valor || '').split('-');
+    return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : '';
+  }
+  function atualizaDados() {
+    var tri = $('trimestre').value, data = $('data').value;
+    $('linha2').value = 'Resultados do ' + tri;
+    $('linha3').value = dataExtenso(data);
+    document.querySelectorAll('[data-trimestre]').forEach(function (el) { el.textContent = tri; });
+    document.querySelectorAll('[data-data-extenso]').forEach(function (el) { el.textContent = dataExtenso(data); });
+    document.querySelectorAll('[data-data-curta]').forEach(function (el) { el.textContent = dataCurta(data); });
+    document.querySelectorAll('[data-versoes]').forEach(function (el) { el.textContent = $('versoes').value; });
+  }
+  ['trimestre', 'data', 'versoes'].forEach(function (id) { $(id).addEventListener('change', atualizaDados); });
+
+  document.querySelectorAll('input[type=file]').forEach(function (input) {
+    input.addEventListener('change', function () {
+      var alvo = document.querySelector('[data-nome-de="' + input.id + '"]');
+      var nome = input.files && input.files[0] ? input.files[0].name : '';
+      if (alvo) { alvo.textContent = nome ? 'Selecionado: ' + nome : ''; alvo.hidden = !nome; }
+      if (input.id === 'arquivo-modelo' && nome) {
+        document.querySelectorAll('[data-modelo]').forEach(function (el) { el.textContent = nome; });
+      }
+    });
+  });
+
+  // ---------- tela 2: acompanhamento (simulação) ----------
+  var ETAPAS = [
+    { nome: 'Download do áudio', detalhe: 'Canal em português e Áudio Original, baixados uma única vez.' },
+    { nome: 'Verificação de cortes', detalhe: 'Procura trechos mudos no canal em português.', feito: 'Um trecho mudo encontrado no canal em português.', alerta: true },
+    { nome: 'Transcrição', detalhe: 'Whisper large-v3 no modo sequencial, com o vocabulário do trimestre.' },
+    { nome: 'Segunda passada nas pausas', detalhe: 'Retranscreve as pausas longas para recuperar falas perdidas e gera um relatório para remover alucinações.' },
+    { nome: 'Separação de falantes', detalhe: 'Identifica as trocas de voz e atribui os nomes pelo contexto.' },
+    { nome: 'Revisão editorial', detalhe: 'Quatro blocos revisados em paralelo no padrão do RI.', blocos: true },
+    { nome: 'Conferências automáticas', detalhe: 'Cobertura da fala, números não falados, traços e parágrafos no Q&A.' },
+    { nome: 'Geração do Word', detalhe: 'Em cima do modelo do trimestre, com os trechos a conferir realçados.' }
+  ];
+  var atual = 0, timer = null;
+
+  function desenhaAcompanhamento() {
+    $('lista-etapas').innerHTML = ETAPAS.map(function (e, i) {
+      var estado = i < atual ? 'feita' : i === atual ? 'rodando' : 'espera';
+      var rotulo = estado === 'feita' ? 'Concluído' : estado === 'rodando' ? 'Em andamento' : 'Aguardando';
+      var icone = estado === 'feita' ? ICONE_OK.replace('16', '18').replace('16', '18') : estado === 'espera' ? String(i + 1) : '';
+      var extra = '';
+      if (estado === 'rodando') {
+        extra += '<div class="barra' + (captura ? '' : ' anima') + '" role="progressbar" aria-label="' + e.nome + '" aria-valuemin="0" aria-valuemax="100"><span></span></div>';
+      }
+      if (e.alerta && estado === 'feita') {
+        extra += '<div class="alerta aviso" role="note"><span class="icone" aria-hidden="true">' + ICONE_ALERTA + '</span><div><strong>Corte de 1min45 aos 15:40</strong>Fala recuperada do canal Áudio Original, que estava cerca de 25 s adiantado.</div></div>';
+      }
+      if (e.blocos) {
+        extra += '<div class="blocos">' + ['Apresentação 1', 'Apresentação 2', 'Q&amp;A 1', 'Q&amp;A 2'].map(function (b) {
+          return '<span class="badge ' + (estado === 'feita' ? 'sucesso' : 'neutro') + ' sm">' + b + '</span>';
+        }).join('') + '</div>';
+      }
+      return '<li><span class="estado ' + estado + '" aria-hidden="true">' + icone + '</span>' +
+        '<div class="etapa-corpo"><div class="etapa-topo"><span class="etapa-nome">' + e.nome + '</span>' +
+        '<span class="etapa-status ' + estado + '">' + rotulo + '</span></div>' +
+        '<span class="etapa-detalhe">' + (estado === 'feita' && e.feito ? e.feito : e.detalhe) + '</span>' + extra + '</div></li>';
+    }).join('');
+
+    var fim = atual >= ETAPAS.length;
+    $('status-job').textContent = fim ? 'Concluído' : 'Em andamento · etapa ' + (atual + 1) + ' de ' + ETAPAS.length;
+    $('status-job').className = 'badge ' + (fim ? 'sucesso' : 'info');
+    $('btn-conferencia').setAttribute('aria-disabled', fim ? 'false' : 'true');
+    $('nota-conferencia').textContent = fim ? 'Tudo pronto para a conferência.' : 'Liberado quando todas as etapas terminarem.';
+    $('btn-pular').hidden = fim;
+  }
+
+  function iniciaSimulacao() {
+    clearInterval(timer);
+    if (captura) { atual = 4; desenhaAcompanhamento(); return; }
+    atual = 0;
+    desenhaAcompanhamento();
+    timer = setInterval(function () {
+      atual += 1;
+      desenhaAcompanhamento();
+      if (atual >= ETAPAS.length) { clearInterval(timer); }
+    }, 1100);
+  }
+  $('btn-pular').addEventListener('click', function () {
+    clearInterval(timer);
+    atual = ETAPAS.length;
+    desenhaAcompanhamento();
+  });
+
+  // ---------- tela 3: conferência ----------
+  var REALCES = [
+    { id: 'r1', cat: 'numero', rotulo: 'Número divergente', tom: 'marca', onde: 'Apresentação · Slide 2', trecho: 'R$ 7,05 bilhões',
+      motivo: 'Falado “7 bilhões e 50 milhões”; o deck mostra R$ 7,1 bilhões. Mantido como foi dito e realçado para o RI decidir.' },
+    { id: 'r2', cat: 'nome', rotulo: 'Nome corrigido', tom: 'info', onde: 'Q&A · Pergunta 1', trecho: 'Mario Pierry (Bank of America)',
+      motivo: 'Transcrito como “Mário Pierre”. Grafia corrigida pela lista de analistas do trimestre.' },
+    { id: 'r3', cat: 'falante', rotulo: 'Falante deduzido', tom: 'info', onde: 'Q&A · Pergunta 3', trecho: 'Cassiano Scarpelli',
+      motivo: 'O falante não foi anunciado. Atribuído pelo contexto: “vou pedir ao Cassiano…”.' },
+    { id: 'r4', cat: 'inaudivel', rotulo: 'Trecho inaudível', tom: 'neutro', onde: 'Q&A · Pergunta 6', trecho: '[inaudível]',
+      motivo: 'Palavra que não deu para entender no áudio. Confira ouvindo o trecho.' },
+    { id: 'r5', cat: 'traducao', rotulo: 'Pergunta em inglês', tom: 'neutro', onde: 'Q&A · Pergunta 8', trecho: 'Pergunta traduzida do Áudio Original',
+      motivo: 'A intérprete omitiu partes da pergunta. O texto saiu do áudio original, traduzido.' }
+  ];
+  var FILTROS = [
+    { id: 'todos', rotulo: 'Todos' }, { id: 'numero', rotulo: 'Números' }, { id: 'nome', rotulo: 'Nomes' },
+    { id: 'falante', rotulo: 'Falantes' }, { id: 'inaudivel', rotulo: 'Inaudíveis' }, { id: 'traducao', rotulo: 'Traduções' }
+  ];
+  var filtro = 'todos', aprovados = {};
+
+  function desenhaConferencia() {
+    $('filtros').innerHTML = FILTROS.map(function (f) {
+      return '<button type="button" data-filtro="' + f.id + '" aria-pressed="' + (f.id === filtro) + '">' + f.rotulo + '</button>';
+    }).join('');
+    var visiveis = REALCES.filter(function (r) { return filtro === 'todos' || r.cat === filtro; });
+    $('lista-realces').innerHTML = visiveis.map(function (r) {
+      var ok = !!aprovados[r.id];
+      return '<article class="realce">' +
+        '<div class="realce-topo"><div class="esq"><span class="badge ' + r.tom + ' sm">' + r.rotulo + '</span><span class="onde">' + r.onde + '</span></div>' +
+        (ok ? '<span class="badge sucesso sm">Aprovado</span>' : '') + '</div>' +
+        '<p class="trecho' + (ok ? ' aprovado' : '') + '"><mark>' + r.trecho + '</mark></p>' +
+        '<p class="motivo">' + r.motivo + '</p>' +
+        '<div class="realce-acoes">' +
+        '<button type="button" class="btn btn-suave btn-sm" data-aviso="No sistema, toca o áudio deste trecho.">Ouvir trecho</button>' +
+        '<button type="button" class="btn btn-secundario btn-sm" data-aviso="No sistema, abre o trecho para edição.">Editar</button>' +
+        (ok ? '<button type="button" class="btn btn-fantasma btn-sm" data-desfazer="' + r.id + '">Desfazer</button>'
+            : '<button type="button" class="btn btn-primario btn-sm sem-sombra" data-aprovar="' + r.id + '">Aprovar</button>') +
+        '</div></article>';
+    }).join('');
+    $('mostrando').textContent = visiveis.length;
+    $('aprovados').textContent = Object.keys(aprovados).length;
+  }
+
+  $('filtros').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-filtro]');
+    if (b) { filtro = b.getAttribute('data-filtro'); desenhaConferencia(); }
+  });
+  $('lista-realces').addEventListener('click', function (ev) {
+    var a = ev.target.closest('[data-aprovar]'), d = ev.target.closest('[data-desfazer]');
+    if (a) { aprovados[a.getAttribute('data-aprovar')] = true; desenhaConferencia(); }
+    if (d) { delete aprovados[d.getAttribute('data-desfazer')]; desenhaConferencia(); }
+  });
+
+  // ---------- avisos dos botões sem ação no protótipo ----------
+  var avisoTimer = null;
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-aviso]');
+    if (!b) { return; }
+    $('aviso').textContent = b.getAttribute('data-aviso');
+    $('aviso').hidden = false;
+    clearTimeout(avisoTimer);
+    avisoTimer = setTimeout(function () { $('aviso').hidden = true; }, 3000);
+  });
+
+  atualizaDados();
+  desenhaConferencia();
+  mostra();
+})();
+</script>
+</body>
+</html>
