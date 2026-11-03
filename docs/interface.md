@@ -6,10 +6,11 @@ A interface só organiza o que os scripts já fazem: cada campo e cada etapa aba
 
 ## Protótipo
 
-- [`interface/prototipo.html`](../interface/prototipo.html): protótipo navegável, num arquivo só. Abra no navegador; não precisa de servidor.
+- **[Abrir o protótipo no navegador](https://lucaslbbahia.github.io/Transcricao-Videoconferencia-Bradesco/interface/prototipo.html)**, publicado pelo GitHub Pages a partir da `main`.
   - Siga o fluxo pelos botões: Iniciar transcrição → Abrir conferência → Gerar Word.
   - O acompanhamento simula as etapas. Na conferência, os filtros e o botão Aprovar funcionam.
   - Os botões de download só mostram um aviso.
+- O código é o [`interface/prototipo.html`](../interface/prototipo.html), num arquivo só. Baixado, também abre direto no navegador, sem servidor.
 - Não processa áudio. Os 5 trechos da conferência, os "OK" das conferências automáticas e o andamento das etapas são exemplos. Os números do 3T26 são os reais: 87,8 min, 15 páginas, 11 analistas, 45 realces e o corte aos 15:40.
 - Visual: cores, raios e sombras do Bradesco Design System. A fonte Hanken Grotesk está no lugar da Bradesco Sans, que é proprietária; troque quando o TI tiver os arquivos licenciados.
 

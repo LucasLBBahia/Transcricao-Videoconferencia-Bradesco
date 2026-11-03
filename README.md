@@ -14,7 +14,7 @@ Processo para produzir a **Transcrição da Videoconferência de Resultados** do
 
 Proposta de uma interface web para o RI rodar o processo sem usar o terminal. A especificação para o TI está em [docs/interface.md](docs/interface.md): cada campo e cada etapa apontam para o script que já faz o trabalho, e a interface só organiza o fluxo.
 
-- **Protótipo navegável:** abra [interface/prototipo.html](interface/prototipo.html) no navegador. Ele não processa áudio: o andamento e os trechos da conferência são exemplos.
+- **Protótipo navegável:** [abrir no navegador](https://lucaslbbahia.github.io/Transcricao-Videoconferencia-Bradesco/interface/prototipo.html). O arquivo está em [interface/prototipo.html](interface/prototipo.html). Ele não processa áudio: o andamento e os trechos da conferência são exemplos.
 - **As quatro telas:**
   1. **Nova transcrição:** trimestre, data, links do YouTube, arquivo modelo `.docx`, cabeçalho do Word, apresentação do trimestre e vocabulário. A transcrição é montada em cima do modelo enviado.
   2. **Acompanhamento:** as 8 etapas do processo, com o estado de cada uma.
