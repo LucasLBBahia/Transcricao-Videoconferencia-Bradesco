@@ -10,6 +10,28 @@ Processo para produzir a **Transcrição da Videoconferência de Resultados** do
   - só 0,4% do texto publicado ficou sem correspondência, num trecho de pergunta em inglês feita via intérprete;
   - 88% dos números saíram idênticos; o restante é edição feita pelo RI.
 
+## Interface (proposta)
+
+Proposta de uma interface web para o RI rodar o processo sem usar o terminal. A especificação para o TI está em [docs/interface.md](docs/interface.md): cada campo e cada etapa apontam para o script que já faz o trabalho, e a interface só organiza o fluxo.
+
+- **Protótipo navegável:** abra [interface/prototipo.html](interface/prototipo.html) no navegador. Ele não processa áudio: o andamento e os trechos da conferência são exemplos.
+- **As quatro telas:**
+  1. **Nova transcrição:** trimestre, data, links do YouTube, arquivo modelo `.docx`, cabeçalho do Word, apresentação do trimestre e vocabulário. A transcrição é montada em cima do modelo enviado.
+  2. **Acompanhamento:** as 8 etapas do processo, com o estado de cada uma.
+  3. **Conferência:** os trechos realçados, para aprovar ou editar antes de gerar o Word.
+  4. **Download:** Word, PDF, versão em inglês e relatório das conferências.
+
+<table>
+  <tr>
+    <td><img src="docs/interface/01-nova-transcricao.png" alt="Tela 1: Nova transcrição" width="400"></td>
+    <td><img src="docs/interface/02-acompanhamento.png" alt="Tela 2: Acompanhamento" width="400"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/interface/03-conferencia.png" alt="Tela 3: Conferência" width="400"></td>
+    <td><img src="docs/interface/04-download.png" alt="Tela 4: Download" width="400"></td>
+  </tr>
+</table>
+
 ## Requisitos
 
 - Windows com Python 3.12, `ffmpeg` e `yt-dlp` no PATH.
